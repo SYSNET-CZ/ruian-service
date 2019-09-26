@@ -1,6 +1,6 @@
 import unittest
 
-from service import database
+from service import
 
 
 class TestDatabase(unittest.TestCase):
