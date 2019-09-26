@@ -172,6 +172,48 @@ def commit_sql(db_name, sql):
         return False
 
 
+def get_table_size(db_name, table_name):
+    sql = "SELECT count(*) FROM " + table_name
+
+    try:
+        db = PostGisDatabase(db_name)
+        out = db.get_query_result(sql)
+        return out[0][0]
+
+    except psycopg2.Error as e:
+        result = "Error: Could not execute query to %s at %s:%s as %s:%s\n/%s" % (
+            DATABASE_NAME_RUIAN, DATABASE_HOST, DATABASE_PORT, DATABASE_USER, sql, str(e))
+        # logger.info("Error: " + e.pgerror)
+        print(result + "\n" + e.pgerror)
+        return -1
+
+    except (ValueError, Exception):
+        print([sys.exc_info()[0]])
+        return -1
+
+
+def get_tables(db_name):
+    sql = "select table_schema, table_name, (xpath('/row/cnt/text()', xml_count))[1]::text::int as row_count from ( " \
+          "select table_name, table_schema, query_to_xml(format('select count(*) as cnt from %I.%I', table_schema, " \
+          "table_name), false, true, '') as xml_count from information_schema.tables where table_schema = 'public' ) t "
+
+    try:
+        db = PostGisDatabase(db_name)
+        out = db.get_query_result(sql)
+        return out
+
+    except psycopg2.Error as e:
+        result = "Error: Could not execute query to %s at %s:%s as %s:%s\n/%s" % (
+            DATABASE_NAME_RUIAN, DATABASE_HOST, DATABASE_PORT, DATABASE_USER, sql, str(e))
+        # logger.info("Error: " + e.pgerror)
+        print(result + "\n" + e.pgerror)
+        return False
+
+    except (ValueError, Exception):
+        print([sys.exc_info()[0]])
+        return False
+
+
 def get_table_names(db_name):
     sql = "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE'"
     try:

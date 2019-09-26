@@ -58,3 +58,4 @@ docs/_build/
 /data/
 ruian_test.db
 nohup.out
+/.idea/
