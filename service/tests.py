@@ -1,6 +1,7 @@
 import unittest
 
 from service import database
+from service import query
 
 
 class TestDatabase(unittest.TestCase):
@@ -42,6 +43,16 @@ class TestDatabase(unittest.TestCase):
         self.assertIsNotNone(tab, "Musí existovat nějaké tabulky databáze 'ruian'")
         print(tab)
 """
+
+
+class TestQuery(unittest.TestCase):
+    def test_find_address(self):
+        ap = 78395364
+        result = query._find_address(ap)
+        self.assertIsNotNone(result, "Musí nalézt místo")
+        self.assertEqual(result.houseNumber, "105", "Číslo domu musí být 105")
+        print(ap, result.locality, result.houseNumber)
+
 
 if __name__ == '__main__':
     unittest.main()
