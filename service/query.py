@@ -14,8 +14,8 @@ import psycopg2
 
 from service.database import execute_sql, number_to_string, none_to_string, number_value, \
     PostGisDatabase, format_to_query, DATABASE_NAME_RUIAN, DATABASE_HOST, DATABASE_PORT, DATABASE_USER, commit_sql, \
-    get_ruian_version
-from service.models import Address
+    get_ruian_version, DATABASE_NAME_POVODI
+from service.models import Address, Povodi, Coordinates, CoordinatesGps, Parcela
 
 __author__ = 'SYSNET'
 
@@ -44,8 +44,113 @@ ADDRESSPOINTS_COLUMNS_VALIDATE = "gid, cislo_domovni, cislo_orientacni, znak_cis
 
 ADDRESSPOINTS_COLUMNS_FIND_COORD = "latitude, longitude, gid, nazev_obce, nazev_casti_obce, nazev_ulice, " \
                                    "cislo_domovni, typ_so, cislo_orientacni, znak_cisla_orientacniho, psc, nazev_mop"
+ROZVODNICE_COLUMNS_GET = "*"
+ROZVODNICE_COLUMNS_GET_LIST = "rozvodnice_4.fid, rozvodnice_4.chp, rozvodnice_4.chp_u, rozvodnice_4.chp_d, " \
+                              "rozvodnice_4.naz_tok, rozvodnice_4.naz_tok_2, rozvodnice_3.fid, rozvodnice_3.naz_pov, " \
+                              "rozvodnice_2.fid, rozvodnice_2.naz_pov, rozvodnice_1.fid, rozvodnice_1.naz_pov"
+ROZVODNICE_TABLE_NAME = "rozvodnice_4"
+PARCELY_COLUMNS_GET_LIST = "parcely.id, parcely.kmenovecislo, parcely.pododdelenicisla, parcely.vymeraparcely, " \
+                           "parcely.katastralniuzemikod, katastralniuzemi.nazev, katastralniuzemi.obeckod, " \
+                           "obce.nazev, obce.statuskod, obce.okreskod, obce.poukod, " \
+                           "okresy.nazev, okresy.krajkod, okresy.vusckod, pou.nazev, pou.orpkod, " \
+                           "kraje.nazev, kraje.statkod, vusc.nazev, vusc.regionsoudrznostikod, vusc.nutslau, " \
+                           "orp.nazev, staty.nazev, staty.nutslau, " \
+                           "regionysoudrznosti.nazev, regionysoudrznosti.nutslau "
 
 MAX_COUNT = 10
+
+
+def _convert_point_to_wgs(y, x):
+    geom = "ST_GeomFromText('POINT(-%s -%s)',5514)" % (str(x), str(y))
+    # sql = "SELECT ST_AsText(ST_Transform(" + geom + ", 4326)) AS wgs_geom;"
+    sql = "SELECT ST_Transform(" + geom + ", 4326) AS wgs_geom;"
+    cur = execute_sql(DATABASE_NAME_POVODI, sql)
+    out = cur.fetchone()
+    cur.close()
+    return out
+
+
+def _convert_point_to_jtsk(lat, lon):
+    # TODO: NEFUNGUJE
+    geom = "ST_GeomFromText('POINT(-%s -%s)',4326)" % (str(lat), str(lon))
+    sql = "SELECT ST_Transform(" + geom + ", 5514) AS jtsk_geom;"
+    cur = execute_sql(DATABASE_NAME_POVODI, sql)
+    out = cur.fetchone()
+    cur.close()
+    return out
+
+
+def _convert_coord_to_wgs(coord: Coordinates):
+    point = _convert_point_to_wgs(coord.y, coord.x)
+    if point is not None:
+        out = CoordinatesGps(point[0].y, point[0].x)
+        return out
+    return None
+
+
+def _convert_coord_to_jtsk(coord: CoordinatesGps):
+    # TODO: NEFUNGUJE
+    point = _convert_point_to_jtsk(coord.lat, coord.lon)
+    if point is not None:
+        out = Coordinates(point[0].y, point[0].x)
+        return out
+    return None
+
+
+def _get_parcela(y, x):
+    # HOTOVO
+    geom = "parcely.originalnihranice,ST_GeomFromText('POINT(-%s -%s)',5514)" % (str(x), str(y))
+    sql = "SELECT " + PARCELY_COLUMNS_GET_LIST + \
+          "FROM parcely " \
+          "LEFT OUTER JOIN katastralniuzemi ON (parcely.katastralniuzemikod=katastralniuzemi.kod) " \
+          "LEFT OUTER JOIN obce ON (katastralniuzemi.obeckod=obce.kod) " \
+          "LEFT OUTER JOIN okresy ON (obce.okreskod=okresy.kod) " \
+          "LEFT OUTER JOIN pou ON (obce.poukod=pou.kod) " \
+          "LEFT OUTER JOIN kraje ON (okresy.krajkod=kraje.kod) " \
+          "LEFT OUTER JOIN vusc ON (okresy.vusckod=vusc.kod) " \
+          "LEFT OUTER JOIN orp ON (pou.orpkod=orp.kod) " \
+          "LEFT OUTER JOIN staty ON (kraje.statkod=staty.kod) " \
+          "LEFT OUTER JOIN regionysoudrznosti ON (vusc.regionsoudrznostikod=regionysoudrznosti.kod) " \
+          "WHERE ST_Contains(%s);" \
+          % geom
+    cur = execute_sql(DATABASE_NAME_RUIAN, sql)
+    row = cur.fetchone()
+    cur.close()
+    if row is None:
+        return None
+    out: Parcela = Parcela(row)
+    return out
+
+
+def _get_rozvodnice(y, x):
+    # HOTOVO
+    geom = "rozvodnice_4.geom,ST_GeomFromText('POINT(-%s -%s)',5514)" % (str(x), str(y))
+    sql = "SELECT " + ROZVODNICE_COLUMNS_GET_LIST + \
+          " " + "FROM rozvodnice_4 " \
+                "LEFT OUTER JOIN rozvodnice_3 ON (SUBSTRING(rozvodnice_4.chp, 1, 7)=rozvodnice_3.chp_3r) " \
+                "LEFT OUTER JOIN rozvodnice_2 ON (SUBSTRING(rozvodnice_4.chp, 1, 4)=rozvodnice_2.chp_2r) " \
+                "LEFT OUTER JOIN rozvodnice_1 ON (SUBSTRING(rozvodnice_4.chp, 1, 1)=rozvodnice_1.chp_1r) " \
+                "WHERE ST_Contains(%s);" \
+          % geom
+    cur = execute_sql(DATABASE_NAME_POVODI, sql)
+    row = cur.fetchone()
+    cur.close()
+    if row is None:
+        return None
+    out: Povodi = Povodi(row)
+    # jtsk = Coordinates(y, x)
+    # wgs = _convert_coord_to_wgs(jtsk)
+    # out.jtsk = jtsk
+    # out.wgs = wgs
+    return out
+
+
+def _get_rozvodnice_wgs(lat, lon):
+    # TODO: NEFUNGUJE
+    c0 = CoordinatesGps(lat, lon)
+    c1: Coordinates = _convert_coord_to_jtsk(c0)
+    out = _get_rozvodnice(-c1.y, -c1.x)
+    return out
 
 
 def _find_address(identifier):

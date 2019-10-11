@@ -1,5 +1,29 @@
 # ruian-service
 
+## python requirements.txt
+
+vyrobit:
+
+        pip freeze > requirements.txt
+
+použít:
+
+        pip install -r requirements.txt
+    
+
+## Flask REST API
+https://medium.com/@onejohi/building-a-simple-rest-api-with-python-and-flask-b404371dc699
+
+linux:
+
+        $ export FLASK_ENV=development
+        $ export FLASK_APP=app.py
+
+windoze:
+        
+        > set FLASK_ENV=development
+        > set FLASK_APP=app.py
+
 
 ## Podklady pro SQL dotazování
 

@@ -261,3 +261,57 @@ Point(-770180.3, -1068551.0)
 Point(x=-770180.3, y=-1068551.0, srid=5514)
 X:	-770180.3
 Y:	-1068551.0
+
+==========================================
+SELECT
+parcely.id,
+parcely.kmenovecislo,
+parcely.pododdelenicisla,
+parcely.vymeraparcely,
+parcely.katastralniuzemikod,
+katastralniuzemi.nazev,
+katastralniuzemi.obeckod,
+obce.nazev,
+obce.statuskod,
+obce.okreskod,
+obce.poukod,
+okresy.nazev,
+okresy.krajkod,
+okresy.vusckod,
+pou.nazev,
+pou.orpkod,
+kraje.nazev,
+kraje.statkod,
+vusc.nazev,
+vusc.regionsoudrznostikod,
+vusc.nutslau,
+orp.nazev,
+staty.nazev,
+staty.nutslau,
+regionysoudrznosti.nazev,
+regionysoudrznosti.nutslau
+FROM parcely
+LEFT OUTER JOIN katastralniuzemi ON (parcely.katastralniuzemikod=katastralniuzemi.kod)
+LEFT OUTER JOIN obce ON (katastralniuzemi.obeckod=obce.kod)
+LEFT OUTER JOIN okresy ON (obce.okreskod=okresy.kod)
+LEFT OUTER JOIN pou ON (obce.poukod=pou.kod)
+LEFT OUTER JOIN kraje ON (okresy.krajkod=kraje.kod)
+LEFT OUTER JOIN vusc ON (okresy.vusckod=vusc.kod)
+LEFT OUTER JOIN orp ON (pou.orpkod=orp.kod)
+LEFT OUTER JOIN staty ON (kraje.statkod=staty.kod)
+LEFT OUTER JOIN regionysoudrznosti ON (vusc.regionsoudrznostikod=regionysoudrznosti.kod)
+WHERE st_contains(parcely.originalnihranice,'SRID=5514;POINT(-770180.3 -1068551.0)');
+==========================================
+SELECT
+rozvodnice_4.fid,
+rozvodnice_4.chp,
+rozvodnice_4.chp_u,
+rozvodnice_4.chp_d,
+rozvodnice_4.naz_tok,
+rozvodnice_4.naz_tok_2,
+rozvodnice_3.fid,
+rozvodnice_3.naz_pov
+FROM rozvodnice_4 LEFT OUTER JOIN rozvodnice_3 ON (SUBSTRING(rozvodnice_4.chp, 1, 7)=rozvodnice_3.chp_3r)
+WHERE st_contains(rozvodnice_4.geom,'SRID=5514;POINT(-770180.3 -1068551.0)');
+==========================================
+
