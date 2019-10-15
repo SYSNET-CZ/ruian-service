@@ -11,7 +11,7 @@ ENV RUIAN_POSTGIS_USER=docker
 ENV RUIAN_POSTGIS_PASSWORD=docker
 ENV FLASK_ENV=development
 # ENV FLASK_ENV=production
-ENV FLASK_APP=api/app.py
+ENV FLASK_APP=app.py
 EXPOSE 5000
 ENTRYPOINT ["python"]
-CMD ["api/app.py"]
+CMD ["app.py"]
