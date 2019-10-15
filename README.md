@@ -13,6 +13,8 @@ použít:
 
 ## Flask REST API
 https://medium.com/@onejohi/building-a-simple-rest-api-with-python-and-flask-b404371dc699
+https://flask-restful.readthedocs.io/en/latest/quickstart.html
+
 
 linux:
 
@@ -290,3 +292,12 @@ Point(-770180.3, -1068551.0)
 Point(x=-770180.3, y=-1068551.0, srid=5514)
 X:	-770180.3
 Y:	-1068551.0
+
+
+## Dockerizace
+
+http://containertutorials.com/docker-compose/flask-simple-app.html
+
+        docker build -t ruian-service:latest .
+
+        docker run -d --name ruian-service -p 5000:5000 ruian-service
