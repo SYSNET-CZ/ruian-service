@@ -15,4 +15,4 @@ ENV FLASK_ENV=development
 ENV FLASK_APP=app.py
 EXPOSE 5000
 # ENTRYPOINT ["python"]
-CMD ["gunicorn -b 0.0.0.0:5000 app"]
+CMD ["gunicorn", "app:app", "-b", "0.0.0.0:5000"]

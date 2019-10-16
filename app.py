@@ -1,11 +1,13 @@
 import json
 
-from flask import Flask, Response
+from flask import Flask, Response, redirect, request
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from service.ruian_connection import get_parcela, get_rozvodnice
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 api = Api(app)
+
 
 TODOS = {
     'todo1': {'task': 'build an API'},
@@ -186,8 +188,8 @@ api.add_resource(TodoList, '/todos')
 api.add_resource(Todo, '/todos/<todo_id>')
 api.add_resource(GeolocationList, '/geolocations')
 api.add_resource(Geolocation, '/geolocations/<geo_id>')
-api.add_resource(ParcelaApi, '/geoapi/parcela')
-api.add_resource(RozvodniceApi, '/geoapi/rozvodnice')
+api.add_resource(ParcelaApi, '/geoapi/parcela', '/geoapi/parcela/', endpoint="geoapi")
+api.add_resource(RozvodniceApi, '/geoapi/rozvodnice', '/geoapi/rozvodnice/', endpoint="geoapi")
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
