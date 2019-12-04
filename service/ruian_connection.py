@@ -1,29 +1,15 @@
 from service.query import _find_address, _get_nearby_localities, _validate_address, _find_coordinates, \
     _find_coordinates_by_address, _get_ruian_version_date, _set_ruian_version_data_today, _get_database_details, \
-    _get_table_names, _get_addresses, _get_parcela, _get_rozvodnice
+    _get_table_names, _get_addresses, _get_adresa
 
-get_parcela = _get_parcela
-get_rozvodnice = _get_rozvodnice
+get_adresa = _get_adresa
 find_address = _find_address
 get_nearby_localities = _get_nearby_localities
-validateAddress = _validate_address
-findCoordinates = _find_coordinates
-findCoordinatesByAddress = _find_coordinates_by_address
-getRUIANVersionDate = _get_ruian_version_date
-saveRUIANVersionDateToday = _set_ruian_version_data_today
-getDBDetails = _get_database_details
-getTableNames = _get_table_names
-getAddresses = _get_addresses
-
-def build_validateDict(street, houseNumber, recordNumber, orientationNumber, orientationNumberCharacter, zipCode, locality, localityPart, districtNumber):
-    return {
-        "street": street,
-        "houseNumber": houseNumber,
-        "recordNumber": recordNumber,
-        "orientationNumber": orientationNumber,
-        "orientationNumberCharacter": orientationNumberCharacter,
-        "zipCode": str(zipCode).replace(" ", ""),
-        "locality": locality,
-        "localityPart": localityPart,
-        "districtNumber": districtNumber
-    }
+validate_address = _validate_address
+find_coordinates = _find_coordinates
+find_coordinates_by_address = _find_coordinates_by_address
+get_ruian_version_date = _get_ruian_version_date
+save_ruian_version_date_today = _set_ruian_version_data_today
+get_db_details = _get_database_details
+get_table_names = _get_table_names
+get_addresses = _get_addresses

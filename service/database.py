@@ -19,26 +19,33 @@ from postgis.psycopg import register
 
 __author__ = 'SYSNET'
 
-DATABASE_HOST = os.getenv("RUIAN_POSTGIS_HOST", "postgis")
-DATABASE_PORT = os.getenv("RUIAN_POSTGIS_PORT", 5432)
+DATABASE_HOST = os.getenv("POSTGIS_HOST", "postgis")
+DATABASE_PORT = os.getenv("POSTGIS_PORT", 5432)
 DATABASE_NAME_RUIAN = os.getenv("RUIAN_DATABASE", "ruian")
 DATABASE_NAME_POVODI = os.getenv("POVODI_DATABASE", "povodi")
-DATABASE_USER = os.getenv("RUIAN_POSTGIS_USER", "docker")
-DATABASE_PASS = os.getenv("RUIAN_POSTGIS_PASSWORD", "docker")
+DATABASE_NAME_MAPY = os.getenv("MAPY_DATABASE", "mapy")
+DATABASE_USER = os.getenv("POSTGIS_USER", "docker")
+DATABASE_PASS = os.getenv("POSTGIS_PASSWORD", "docker")
 
+ADMINISTRATIVE_DIVISION_TABLE_NAME = "administrative_division"
+ADMINISTRATIVE_DIVISION_ZSJ_TABLE_NAME = "administrative_division_zsj"
+ADMINISTRATIVE_DIVISION_KU_TABLE_NAME = "administrative_division_ku"
+ADDRESSPOINTS_TABLE_NAME = "address_points"
+FULLTEXT_TABLENAME = "fulltext"
+ZVM50KLAD_TABLENAME = "zvm50klad"
 
-def none_to_string(item):
-    if item is None:
-        return ""
-    else:
-        return item
-
-
-def number_to_string(number):
-    if number is None:
-        return ""
-    else:
-        return str(number)
+TOWNNAME_FIELDNAME = "nazev_obce"
+STREETNAME_FIELDNAME = "nazev_ulice"
+TOWNPART_FIELDNAME = "nazev_casti_obce"
+GID_FIELDNAME = "gid"
+GIDS_FIELDNAME = "gids"
+TYP_SO_FIELDNAME = "typ_so"
+CISLO_DOMOVNI_FIELDNAME = "cislo_domovni"
+CISLO_ORIENTACNI_FIELDNAME = "cislo_orientacni"
+ZNAK_CISLA_ORIENTACNIHO_FIELDNAME = "znak_cisla_orientacniho"
+ZIP_CODE_FIELDNAME = "psc"
+MOP_NUMBER = "nazev_mop"
+MOP_NAME = "nazev_mop"
 
 
 def format_to_query(item):
@@ -83,25 +90,24 @@ class PostGisDatabase(object):
 
     def get_query_result(self, query):
         cur = None
+        rows = []
         try:
             cur = self.connection.cursor()
             cur.execute(query)
-            rows = []
             row_count = 0
             for row in cur:
                 row_count += 1
                 rows.append(row)
-            return rows
 
         except psycopg2.Error as e:
             result = "Error: Could not execute query to %s at %s:%s as %s:%s" % (
                 DATABASE_NAME_RUIAN, DATABASE_HOST, DATABASE_PORT, DATABASE_USER, query)
             # logger.info("Error: " + e.pgerror)
             print(result + "\n" + e.pgerror)
-            return None
 
         finally:
             cur.close()
+            return rows
 
     def get_info(self):
         par = self.connection.get_dsn_parameters()
@@ -125,6 +131,49 @@ def get_ruian_version():
         return result
     finally:
         cur.close()
+
+
+def get_rows(db_name, sql):
+    out = []
+    try:
+        cur = execute_sql(db_name, sql)
+        rows = cur.fetchall()
+        cur.close()
+        row_count = 0
+        for row in rows:
+            row_count += 1
+            out.append(row[0])
+        return out
+    except (ValueError, Exception) as e:
+        print(e)
+        return out
+
+
+def get_row(db_name, sql):
+    out = None
+    try:
+        cur = execute_sql(db_name, sql)
+        out = cur.fetchone()
+        cur.close()
+        return out
+    except (ValueError, Exception) as e:
+        print(e.pgerror)
+        return out
+
+
+def get_result(db_name, sql):
+    if sql is None or sql == "":
+        return None
+    try:
+        db = PostGisDatabase(db_name)
+        rows = db.get_query_result(sql)
+        return rows
+    except psycopg2.Error as e:
+        result = "Error: Could not get result for %s at %s:%s as %s:%s" % (
+            DATABASE_NAME_RUIAN, DATABASE_HOST, DATABASE_PORT, DATABASE_USER, sql)
+        # logger.info("Error: " + e.pgerror)
+        print(result + "\n" + e.pgerror)
+        return []
 
 
 def execute_sql(db_name, sql):
@@ -243,6 +292,24 @@ def db_info(db_name):
 
     except (ValueError, Exception):
         return [sys.exc_info()[0]]
+
+
+def get_obec_by_name(name):
+    sql = "SELECT {0} FROM {1} WHERE {0} ilike '%{2}%' group by {0} limit 25".format(
+        TOWNNAME_FIELDNAME, "ac_obce", name)
+    return get_rows(DATABASE_NAME_RUIAN, sql)
+
+
+def get_ulice_by_name(name):
+    sql = "SELECT {0} FROM {1} WHERE {0} ILIKE '%{2}%' GROUP BY {0} LIMIT 25".format(
+        STREETNAME_FIELDNAME, "ac_ulice", name)
+    return get_rows(DATABASE_NAME_RUIAN, sql)
+
+
+def get_cast_obce_by_name(name):
+    sql = "SELECT nazev_casti_obce FROM ac_casti_obce WHERE nazev_casti_obce ilike '%" + \
+          name + "%' group by nazev_casti_obce limit 25"
+    return get_rows(DATABASE_NAME_RUIAN, sql)
 
 
 class DatabaseError(Exception):

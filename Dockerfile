@@ -4,12 +4,14 @@ COPY . /opt/geoservice
 WORKDIR /opt/geoservice
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-ENV RUIAN_POSTGIS_HOST=postgis
-ENV RUIAN_POSTGIS_PORT=5432
+ENV POSTGIS_HOST=postgis
+ENV POSTGIS_PORT=5432
 ENV RUIAN_DATABASE=ruian
 ENV POVODI_DATABASE=povodi
-ENV RUIAN_POSTGIS_USER=docker
-ENV RUIAN_POSTGIS_PASSWORD=docker
+ENV MAPY_DATABASE=mapy
+ENV POSTGIS_USER=docker
+ENV POSTGIS_PASSWORD=docker
+ENV RESOURCE_PREFIX=geoapi
 ENV FLASK_ENV=development
 # ENV FLASK_ENV=production
 ENV FLASK_APP=app.py

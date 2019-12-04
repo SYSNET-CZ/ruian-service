@@ -1,5 +1,6 @@
 aniso8601==8.0.0
 Click==7.0
+dicttoxml==1.7.4
 Flask==1.1.1
 Flask-RESTful==0.3.7
 gunicorn==19.9.0
