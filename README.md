@@ -1,303 +1,93 @@
 # ruian-service
 
-## python requirements.txt
+Rychlá reverzní geolokační služba založená na datech veřejného registru RUIAN.
+Služby jsou poskytovány pomocí jednotného REST API. 
+V aktuální verzi jsou k dispozici tyto reverzně geolokační služby
 
-vyrobit:
+- __Parcela__: Vrací identifikaci parcely vstupního bodu a informace o nadřazeném správním členění
+* __Základní sídelní jednotka__: Vrací identifikaci ZSJ vstupního bodu a informace o nadřazeném správním členění
+* __Katastrální území__: Vrací identifikaci KÚ vstupního bodu a informace o nadřazeném správním členění
+* __Povodí__: Vrací identifikaci povodí vstupního bodu a informace o nadřazených povodích
+* __Mapový list 1:50000__: Vrací identifikaci mapového listu Základní mapy ČR 1:50 000
 
-        pip freeze > requirements.txt
+## REST API
+V případě služeb reverzní geolokace se používají metody GET a POST. 
 
-použít:
+### GET API
+Parametry jsou součástí URL:
 
-        pip install -r requirements.txt
-    
+#### Parcela
 
-## Flask REST API
-https://medium.com/@onejohi/building-a-simple-rest-api-with-python-and-flask-b404371dc699
-https://flask-restful.readthedocs.io/en/latest/quickstart.html
-
-
-linux:
-
-        $ export FLASK_ENV=development
-        $ export FLASK_APP=app.py
-
-windoze:
+        GET /geoapi/parcela?x=<jtsk.x>&y=<jtsk.y>
         
-        > set FLASK_ENV=development
-        > set FLASK_APP=app.py
+#### Základní sídelní jednotka
 
+        GET /geoapi/zsj?x=<jtsk.x>&y=<jtsk.y>
 
-## Podklady pro SQL dotazování
+#### Katastrální území
 
-INSERT into spatial_ref_sys (srid, auth_name, auth_srid, proj4text, srtext) values ( 5514, 'EPSG', 5514, '+proj=krovak +lat_0=49.5 +lon_0=24.83333333333333 +alpha=30.28813972222222 +k=0.9999 +x_0=0 +y_0=0 +ellps=bessel +towgs84=589,76,480,0,0,0,0 +units=m +no_defs ', 'PROJCS["S-JTSK / Krovak East North",GEOGCS["S-JTSK",DATUM["System_Jednotne_Trigonometricke_Site_Katastralni",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],TOWGS84[589,76,480,0,0,0,0],AUTHORITY["EPSG","6156"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4156"]],PROJECTION["Krovak"],PARAMETER["latitude_of_center",49.5],PARAMETER["longitude_of_center",24.83333333333333],PARAMETER["azimuth",30.28813972222222],PARAMETER["pseudo_standard_parallel_1",78.5],PARAMETER["scale_factor",0.9999],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],AUTHORITY["EPSG","5514"]]');
+        GET /geoapi/ku?x=<jtsk.x>&y=<jtsk.y>
 
+#### Povodí
 
-X:	-770180.3
-Y:	-1068551.0
+        GET /geoapi/rozvodnice?x=<jtsk.x>&y=<jtsk.y>
 
+#### Mapový list 1:50000
 
-wkt_geom			Point (-770181.51000000000931323 -1068550.37999999988824129)
-ogc_fid				229326	
-gml_id				AD.78395364	
-kod				78395364
-nespravny	
-cislodomovni			105	
-cisloorientacni			NULL
-cisloorientacnipismeno
-psc				26724
-stavebniobjektkod		94092133
-ulicekod			NULL
-platiod				2018-05-31T00:00:00
-platido	
-idtransakce			2428873
-globalniidnavrhuzmeny		1759334
-isknbudovaid			NULL
-zachranka			SRID=5514;POINT(-770181.51 -1068549.52)
-hasici				SRID=5514;POINT(-770181.71 -1068551.64)
+        GET /geoapi/maplist50?x=<jtsk.x>&y=<jtsk.y>
 
 
+### POST API
+Parametry jsou předávány v těle JSON zprávy:
 
-select * from katastralniuzemi where st_distance(originalnihranice,'SRID=5514;POINT(-770180.3 -1068551.0)') < 2;
+        {"x":<jtsk.x>,"y":<jtsk.y>}
 
-ST_Contains(geometry geomA, geometry geomB);
+#### Parcela
 
-select * from katastralniuzemi where st_contains(originalnihranice,'SRID=5514;POINT(-770180.3 -1068551.0)');
+        POST /geoapi/parcela
 
-select * from katastralniuzemi LEFT OUTER JOIN obce on (katastralniuzemi.obeckod=obce.kod) where st_contains(originalnihranice,'SRID=5514;POINT(-770180.3 -1068551.0)');
+#### Základní sídelní jednotka
 
+        POST /geoapi/zsj
 
+#### Katastrální území
 
-LEFT OUTER JOIN obce on (katastralniuzemi.obeckod=obce.kod)
+        POST /geoapi/ku
 
+#### Povodí
 
+        POST /geoapi/rozvodnice
 
+#### Mapový list 1:50000
 
-geometry ST_Transform(geometry geom, text from_proj, text to_proj);
-
-
-
-SELECT ST_AsText(ST_Transform(ST_GeomFromText('POLYGON((743238 2967416,743238 2967450,743265 2967450,743265.625 2967416,743238 2967416))',2249),4326)) As wgs_geom;
-
-SELECT ST_AsText(ST_Transform(ST_GeomFromText('POINT(-770180.3 -1068551.0)',5514),4326)) As wgs_geom;
-
-
-wgs_geom
-POINT(14.0928261730485 49.8260545514689)
-
-
-
-
-
-
-ogc_fid 
-gml_id 
-kod 
-nespravny 
-cislodomovni 
-cisloorientacni 
-cisloorientacnipismeno 
-psc 
-stavebniobjektkod 
-ulicekod 
-platiod 
-platido 
-idtransakce 
-globalniidnavrhuzmeny 
-isknbudovaid 
-adresnibod 
-zachranka 
-hasici 
-
-gml_id, kod, cislodomovni, cisloorientacni, cisloorientacnipismeno, psc, stavebniobjektkod, ulicekod 
-
-
-select *
-from pou
-where st_contains(originalnihranice,'SRID=5514;POINT(-770180.3 -1068551.0)');
-
-
-SELECT gml_id, kod, cislodomovni, cisloorientacni, cisloorientacnipismeno, psc, stavebniobjektkod, ulicekod, ST_Distance(adresnibod , ST_Transform(ST_GeometryFromText('POINT(-770180.3 -1068551.0)', 5514), 900913))
-FROM adresnimista
-ORDER BY ST_Distance(adresnibod , ST_GeometryFromText('POINT(14.4180933 50.0767469)', 4326))
-LIMIT 10;
-
-
-
-SELECT gml_id, kod, cislodomovni, cisloorientacni, cisloorientacnipismeno, psc, stavebniobjektkod, ulicekod, ST_Distance(adresnibod , ST_GeometryFromText('POINT(-770180.3 -1068551.0)', 5514))
-FROM adresnimista
-ORDER BY ST_Distance(adresnibod , ST_GeometryFromText('POINT(-770180.3 -1068551.0)', 5514))
-LIMIT 10;
-
-SELECT gml_id, kod, cislodomovni, cisloorientacni, cisloorientacnipismeno, psc, stavebniobjektkod, ulicekod, ST_Distance(adresnibod , ST_GeometryFromText('POINT(-770180.3 -1068551.0)', 5514))
-FROM adresnimista
-ORDER BY ST_Distance(adresnibod , ST_GeometryFromText('POINT(-770180.3 -1068551.0)', 5514))
-LIMIT 10;
-
-
-
-SELECT * FROM Customers
-WHERE Country='Mexico';
-
-
-
-katastralniuzemi.gml_id
-katastralniuzemi.kod
-katastralniuzemi.nazev
-katastralniuzemi.obeckod
-obce.gml_id
-obce.kod
-obce.nazev
-obce.statuskod
-obce.okreskod
-obce.poukod
-obce.nutslau
-okresy.gml_id
-okresy.kod
-okresy.nazev
-okresy.krajkod
-okresy.vusckod
-okresy.nutslau
-kraje.gml_id
-kraje.kod
-kraje.nazev
-kraje.statkod
-pou.gml_id
-pou.kod
-pou.nazev
-pou.spravniobeckod
-pou.orpkod
-
-
-
-
-
-
-
-
-gml_id,kod,nazev,obeckod
-
-
-
-
-
-select katastralniuzemi.gml_id, katastralniuzemi.kod, katastralniuzemi.nazev  obce.
-from katastralniuzemi 
-LEFT OUTER JOIN obce on (katastralniuzemi.obeckod=obce.kod) 
-where st_contains(katastralniuzemi.originalnihranice,'SRID=5514;POINT(-770180.3 -1068551.0)');
-
-
-
-
-
-
-
-ST_Distance(adresnibod , ST_Transform(ST_GeometryFromText('POINT(-770180.3 -1068551.0)', 5514), 900913))
-
-
-
-
-import psycopg2
-from postgis import LineString
-from postgis import Point
-from postgis.psycopg import register
-db = psycopg2.connect("dbname='ruian' user='docker' host='localhost' password='docker'")
-register(db)
-cursor = db.cursor()
-
-
-//cursor.execute('CREATE TABLE IF NOT EXISTS mytable ("geom" geometry(LineString) NOT NULL)')
-//cursor.execute('INSERT INTO mytable (geom) VALUES (%s)', [LineString([(1, 2), (3, 4)], srid=4326)])
-//cursor.execute('SELECT geom FROM mytable LIMIT 1')
-
-
-cursor.execute("select * from katastralniuzemi where st_contains(originalnihranice,'SRID=5514;POINT(-770180.3 -1068551.0)')")
-
-
-geom = cursor.fetchone()[0]
-
-
-
-
-
-
-
-
-
-
-
-import sys
->>> sys.modules[__name__].__dict__.clear()
-
-
-
-
-
-
-
-
-
-
-
-> import psycopg2
-> from postgis import LineString
-> from postgis.psycopg import register
-> db = psycopg2.connect(dbname="test")
-> register(db)
-cursor = db.cursor()
-
-> cursor.execute('CREATE TABLE IF NOT EXISTS mytable ("geom" geometry(LineString) NOT NULL)')
-> cursor.execute('INSERT INTO mytable (geom) VALUES (%s)', [LineString([(1, 2), (3, 4)], srid=4326)])
-> cursor.execute('SELECT geom FROM mytable LIMIT 1')
-> geom = cursor.fetchone()[0]
-> geom
-<LineString LINESTRING(1.0 2.0, 3.0 4.0)>
-> geom[0]
-<Point POINT(1.0 2.0)>
-> geom.coords
-((1.0, 2.0), (3.0, 4.0))
-> geom.geojson
-{'coordinates': ((1.0, 2.0), (3.0, 4.0)), 'type': 'LineString'}
-> str(geom.geojson)
-'{"type": "LineString", "coordinates": [[1, 2], [3, 4]]}'
-
-
-
-
-
-db = psycopg2.connect("dbname='test' user='docker' host='localhost' password='docker'")
-db1 = psycopg2.connect("dbname='ruian' user='docker' host='localhost' password='docker'")
-cursor1 = db1.cursor()
-cursor1.execute('SELECT * FROM public.katastralniuzemi LIMIT 1')
-
-
-cursor1.fetchone()[19]
-
-
-SELECT * FROM public.katastralniuzemi 
-
-
-ST_Within(geometry A, geometry B)
-
-[LineString([(1, 2), (3, 4)], srid=4326)]
-
-
-SELECT * FROM public.katastralniuzemi WHERE ST_Within(p, originalnihranice);
-
-
-
-Point(-770180.3, -1068551.0)
-
-
-
-Point(x=-770180.3, y=-1068551.0, srid=5514)
-X:	-770180.3
-Y:	-1068551.0
-
+        POST /geoapi/maplist50
 
 ## Dockerizace
 
-http://containertutorials.com/docker-compose/flask-simple-app.html
+Pro nastavení parametrů aplikace se používají tyto systémové proměnné, které lze v rámci nasazeni kontejneru změnít:
+
+* __POSTGIS_HOST__ _hostitel služby PostGIS_
+* __POSTGIS_PORT__ _TCP port služby PostGIS_
+* __RUIAN_DATABASE__ _název databáze, ve které jsou uložena data RUIAN_
+* __POVODI_DATABASE__ _název databáze, ve které jsou uložena data povodí_
+* __MAPY_DATABASE__ _název databáze, ve které jsou uložena data kladu map 1:50000_
+* __POSTGIS_USER__ _jméno oprávněného uživatele služby PostGIS_
+* __POSTGIS_PASSWORD__ _heslo k účtu oprávněného uživatele služby PostGIS_
+* __RESOURCE_PREFIX__ _url prefix služby_
+* __FLASK_ENV__ _prostředí Flask_
+
+
+### vytvoření obrazu a spuštění kontejneru
 
         docker build -t ruian-service:latest .
 
-        docker run -d --name ruian-service -p 5000:5000 ruian-service
+        docker run -d --name ruian-service -e RESOURCE_PREFIX=geoapi -p 5000:5000 ruian-service
+        
+### Spolupráce
+
+Pro správnou funkci kontejneru je třeba mít nainstalovanou PostGIS službu, 
+jejíž identifikaci předáte kontejneru ruian-service pomocí systémových proměnných. 
+
+### Odkazy
+
+http://containertutorials.com/docker-compose/flask-simple-app.html
