@@ -3,7 +3,7 @@ import json
 
 import dicttoxml
 
-from models import none_to_string, formatzip_code, empty_string_if_no_number, alpha_check, PrettyAddress
+from service.models import none_to_string, formatzip_code, empty_string_if_no_number, alpha_check, PrettyAddress
 
 TEXT_FORMAT_JSON = "json"
 TEXT_FORMAT_XML = "xml"

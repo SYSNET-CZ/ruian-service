@@ -12,8 +12,8 @@ import json
 from flask import Response, request
 from flask_restful import Resource, abort, reqparse
 
-from models import Coordinates
-from geolocation_reverse import get_maplist, get_ku, get_parcela, get_povodi, get_zsj
+from service.models import Coordinates
+from service.geolocation_reverse import get_maplist, get_ku, get_parcela, get_povodi, get_zsj
 
 __author__ = 'SYSNET'
 

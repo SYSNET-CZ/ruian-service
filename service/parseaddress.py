@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from models import _SearchItem, none_to_string
-from query import TOWNNAME_FIELDNAME, STREETNAME_FIELDNAME, \
+from service.models import _SearchItem, none_to_string
+from service.query import TOWNNAME_FIELDNAME, STREETNAME_FIELDNAME, \
     TOWNPART_FIELDNAME, MAX_TEXT_COUNT, \
     compile_address
 

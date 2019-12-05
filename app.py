@@ -12,7 +12,7 @@ import os
 from flask import Flask
 from flask_restful import Api
 
-from resources import RozvodniceApi, ParcelaApi, KuApi, MaplistApi, ZsjApi
+from api.resources import RozvodniceApi, ParcelaApi, KuApi, MaplistApi, ZsjApi
 
 RESOURCE_PREFIX = os.getenv("RESOURCE_PREFIX", "geoapi")
 

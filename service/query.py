@@ -27,7 +27,7 @@ from service.database import execute_sql, number_value, \
     ADMINISTRATIVE_DIVISION_KU_TABLE_NAME, ZVM50KLAD_TABLENAME, DATABASE_NAME_MAPY
 from service.models import Address, Povodi, Coordinates, CoordinatesGps, Parcela, AdresniBod, Zsj, Locality, \
     none_to_string, KatastralniUzemi, MapovyList50
-from utils import is_int, number_check
+from service.utils import is_int, number_check
 
 __author__ = 'SYSNET'
 

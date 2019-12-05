@@ -11,9 +11,9 @@
 
 from urllib import parse
 
-from common import TEXT_FORMAT_XML, TEXT_FORMAT_HTML, TEXT_FORMAT_HTML2ONEROW, TEXT_FORMAT_JSON, \
+from service.common import TEXT_FORMAT_XML, TEXT_FORMAT_HTML, TEXT_FORMAT_HTML2ONEROW, TEXT_FORMAT_JSON, \
     TEXT_FORMAT_TEXT2ONEROW, LINE_SEPARATOR_HTML
-from models import none_to_string
+from service.models import none_to_string
 
 services = []
 
