@@ -12,7 +12,8 @@ import json
 from flask import Response, request
 from flask_restful import Resource, abort, reqparse
 
-from service.models import Coordinates
+from service.conversion import point2wgs, point2jtsk
+from service.models import Coordinates, CoordinatesGps
 from service.geolocation_reverse import get_maplist, get_ku, get_parcela, get_povodi, get_zsj
 
 __author__ = 'SYSNET'
@@ -80,7 +81,26 @@ class MaplistApi(Resource):
         return _doit_maplist(_parse_coordinates())
 
 
+# PointToJtskApi: converts point WGS84 (4326) to JTSK (5514)
+class PointToJtskApi(Resource):
+    def get(self):
+        return _doit_point2jtsk(_parse_coordinates_wgs_get())
+
+    def post(self):
+        return _doit_point2jtsk(_parse_coordinates_wgs())
+
+
+# PointToWgsApi: converts point JTSK (5514) to WGS84 (4326)
+class PointToWgsApi(Resource):
+    def get(self):
+        return _doit_point2wgs(_parse_coordinates_get())
+
+    def post(self):
+        return _doit_point2wgs(_parse_coordinates())
+
+
 # NearestApi: returns NearestAdresses from RUIAN
+# TODO
 class NearestApi(Resource):
     def get(self):
         illegal_method('GET')
@@ -130,9 +150,30 @@ def _doit_maplist(geo):
     return _response(geo, item)
 
 
+def _doit_point2wgs(geo):
+    if geo is None:
+        missing_arguments()
+    item = point2wgs(y=geo.y, x=geo.x)
+    return _response(geo, item)
+
+
+def _doit_point2jtsk(geo):
+    if geo is None:
+        missing_arguments()
+    item = point2jtsk(lat=geo.lat, lon=geo.lon)
+    return _response_wgs(geo, item)
+
+
 def _response(geo, item):
     if item is None:
         err = {"error": "Geolocation not found", "x": geo.x, "y": geo.y}
+        return Response(json.dumps(err), mimetype='application/json')
+    return Response(json.dumps(item.__dict__), mimetype='application/json')
+
+
+def _response_wgs(geo, item):
+    if item is None:
+        err = {"error": "Geolocation not found", "lat": geo.lat, "lon": geo.lon}
         return Response(json.dumps(err), mimetype='application/json')
     return Response(json.dumps(item.__dict__), mimetype='application/json')
 
@@ -149,6 +190,18 @@ def _parse_coordinates():
     return out
 
 
+def _parse_coordinates_wgs():
+    args = parser.parse_args()
+    if args is None:
+        return None
+    if 'lat' not in args:
+        return None
+    if 'lon' not in args:
+        return None
+    out = CoordinatesGps(lat=args['lat'], lon=args['lon'])
+    return out
+
+
 def _parse_coordinates_get():
     args = request.args
     x = args['x']
@@ -156,4 +209,13 @@ def _parse_coordinates_get():
     out = None
     if not (x is None) and not (y is None):
         out = Coordinates(x=float(x), y=float(y))
+    return out
+
+def _parse_coordinates_wgs_get():
+    args = request.args
+    lat = args['lat']
+    lon = args['lon']
+    out = None
+    if not (lat is None) and not (lon is None):
+        out = CoordinatesGps(lat=float(lat), lon=float(lon))
     return out

@@ -130,18 +130,23 @@ def _convert_point_to_wgs(y, x):
     # sql = "SELECT ST_AsText(ST_Transform(" + geom + ", 4326)) AS wgs_geom;"
     sql = "SELECT ST_Transform(" + geom + ", 4326) AS wgs_geom;"
     cur = execute_sql(DATABASE_NAME_POVODI, sql)
-    out = cur.fetchone()
+    row = cur.fetchone()
     cur.close()
+    if row is None:
+        return None
+    out = CoordinatesGps(lon=row[0].coords[0], lat=row[0].coords[1])
     return out
 
 
 def _convert_point_to_jtsk(lat, lon):
-    # TODO: NEFUNGUJE
-    geom = "ST_GeomFromText('POINT(%s %s)',4326)" % (str(lat), str(lon))
+    geom = "ST_GeomFromText('POINT(%s %s)',4326)" % (str(lon), str(lat))
     sql = "SELECT ST_Transform(" + geom + ", 5514) AS jtsk_geom;"
     cur = execute_sql(DATABASE_NAME_POVODI, sql)
-    out = cur.fetchone()
+    row = cur.fetchone()
     cur.close()
+    if row is None:
+        return None
+    out = Coordinates(x=row[0].coords[0], y=row[0].coords[1])
     return out
 
 
@@ -558,7 +563,8 @@ def _find_coordinates_by_address(dictionary):
                  house_number, record_number, number_to_string(row[8]), none_to_string(row[9]),
                  number_to_string(row[10]), number_value(none_to_string(row[11])))
             )
-            # latitude, longitude, gid, nazev_obce, nazev_casti_obce, nazev_ulice, cislo_domovni, typ_so, cislo_orientacni, znak_cisla_orientacniho, psc, nazev_mop
+            # latitude, longitude, gid, nazev_obce, nazev_casti_obce, nazev_ulice, cislo_domovni, typ_so,
+            # cislo_orientacni, znak_cisla_orientacniho, psc, nazev_mop
             coord = Coordinates(row[0], row[1])
             addr = Address(row[5], house_number, record_number, row[8], row[9], row[10], row[3], row[4], None, row[11],
                            row[2])
@@ -995,7 +1001,7 @@ def analyze_items(items):
                 pass
         else:
             # else textový řetezec
-            # TODO Udelat
+            # TODO udelat
             # if item.streets == [] and item.streets == [] and item.streets == []:
             #    to_be_skipped = True
             pass
@@ -1010,9 +1016,9 @@ def analyze_items(items):
 
 def parse(address, search_db=True):
     address = normalize(address)
-    stringItems = address.split(",")
+    string_items = address.split(",")
     items = []
-    for value in stringItems:
+    for value in string_items:
         item = AddressItem(value, search_db)
         items.append(item)
     return items
