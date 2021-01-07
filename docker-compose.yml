@@ -32,7 +32,7 @@ services:
       # Add extensions you need to be enabled by default in the DB. Default are the five specified below
       POSTGRES_MULTIPLE_EXTENSIONS: postgis,hstore,postgis_topology,postgis_raster,pgrouting
     ports:
-      - 25432:5432
+      - 127.0.0.1:25432:5432
     networks:
       ruian-net:
         aliases:
@@ -76,8 +76,7 @@ services:
           - pg-backup
     restart: on-failure
     depends_on:
-      postgis:
-        condition: service_healthy
+      - postgis
   pgadmin:
     # https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
     image: dpage/pgadmin4:latest
