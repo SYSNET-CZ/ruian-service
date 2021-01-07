@@ -31,7 +31,7 @@ from service.utils import is_int, number_check
 
 __author__ = 'SYSNET'
 
-# exact_match_needed = False
+exact_match_needed = False
 
 # Konstanty pro logickou strukturu databáze
 MAX_TEXT_COUNT = 3  # maximální počet textových položek v adrese ulice, obec, část obce = 3

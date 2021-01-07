@@ -1,0 +1,98 @@
+version: '3'
+
+volumes:
+  postgis_backup:
+  postgis_data:
+  postgis_logs:
+  pgadmin_data:
+
+networks:
+  ruian-net:
+
+services:
+  postgis:
+    image: kartoza/postgis:${PG_VERSION}
+    container_name: postgis
+    volumes:
+      - postgis_data:${POSTGRES_DATA}
+      - postgis_backup:/backups
+      - postgis_logs:/var/log
+    environment:
+      # If you need to create multiple database you can add coma separated databases eg gis,data
+      TZ: Europe/Prague
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASS: ${POSTGRES_PASS}
+      ALLOW_IP_RANGE: '0.0.0.0/0'
+      RECREATE_DATADIR: 'True'
+      PGDATA: ${POSTGRES_DATA}
+      DEFAULT_COLLATION: ${DEFAULT_COLLATION:-cs_CZ.utf8}
+      DEFAULT_CTYPE: ${DEFAULT_COLLATION:-cs_CZ.utf8}
+      auth: md5
+      # Add extensions you need to be enabled by default in the DB. Default are the five specified below
+      POSTGRES_MULTIPLE_EXTENSIONS: postgis,hstore,postgis_topology,postgis_raster,pgrouting
+    ports:
+      - 25432:5432
+    networks:
+      ruian-net:
+        aliases:
+          - db
+          - postgis
+          - pg
+    restart: on-failure
+    healthcheck:
+      test: "exit 0"
+  postgis-backup:
+    image: kartoza/pg-backup:${PG_VERSION}
+    hostname: postgis-backup
+    container_name: postgis-backup
+    volumes:
+      - postgis_backup:/backups
+    environment:
+      TZ: Europe/Prague
+      DUMPPREFIX: ${POSTGRES_DUMPPREFIX}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASS: ${POSTGRES_PASS}
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: postgis
+      POSTGRES_DBNAME: ${POSTGRES_DB}
+      DEFAULT_ENCODING: UTF8
+      DEFAULT_COLLATION: ${DEFAULT_COLLATION:-cs_CZ.utf8}
+      DEFAULT_CTYPE: ${DEFAULT_COLLATION:-cs_CZ.utf8}
+      auth: md5
+      STORAGE_BACKEND: ${BACKUP_STORAGE_BACKEND}
+      ACCESS_KEY_ID:  ${BACKUP_S3_ACCESS_KEY_ID}
+      SECRET_ACCESS_KEY: ${BACKUP_S3_SECRET_ACCESS_KEY}
+      DEFAULT_REGION: ${BACKUP_S3_DEFAULT_REGION}
+      BUCKET: ${BACKUP_S3_BUCKET}
+      HOST_BASE: ${BACKUP_S3_HOST_BASE}
+      HOST_BUCKET: ${BACKUP_S3_HOST_BUCKET}
+      SSL_SECURE: ${BACKUP_S3_SSL_SECURE}
+    networks:
+      ruian-net:
+        aliases:
+          - db-backup
+          - postgis-backup
+          - pg-backup
+    restart: on-failure
+    depends_on:
+      postgis:
+        condition: service_healthy
+  pgadmin:
+    # https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    environment:
+      - TZ=Europe/Prague
+      - PGADMIN_DEFAULT_EMAIL=admin@sysnet.cz
+      - PGADMIN_DEFAULT_PASSWORD=SuperSecret
+    networks:
+      ruian-net:
+        aliases:
+          - pgadmin
+          - pgadmin4
+    ports:
+      - 127.0.0.1:5050:80
+    restart: on-failure

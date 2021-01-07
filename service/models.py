@@ -24,7 +24,7 @@ class Coordinates(dict, object):
         dict.__init__(self, y=self.y, x=self.x)
 
         # This field will not be sent in the response
-        self.status = 'active'
+        # self.status = 'active'
 
 
 class CoordinatesGps(dict, object):
