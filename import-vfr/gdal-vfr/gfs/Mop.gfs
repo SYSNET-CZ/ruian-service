@@ -1,0 +1,81 @@
+<GMLFeatureClassList>
+  <!-- MOP -->
+  <GMLFeatureClass>
+    <Name>Mop</Name>
+    <ElementPath>Data|Mop|Mop</ElementPath>
+    <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
+    <!-- Geometrie definičního bodu MOP -->
+    <GeomPropertyDefn>
+      <Name>DefinicniBod</Name> 
+      <ElementPath>Geometrie|DefinicniBod</ElementPath> 
+      <Type>Point</Type>
+    </GeomPropertyDefn>
+    <!-- Originální geometrie hranice MOP -->
+    <GeomPropertyDefn>
+      <Name>OriginalniHranice</Name> 
+      <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
+      <Type>MultiPolygon</Type>
+    </GeomPropertyDefn>
+    <!-- Kód MOP -->
+    <PropertyDefn>
+      <Name>Kod</Name>
+      <ElementPath>Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Název MOP -->
+    <PropertyDefn>
+      <Name>Nazev</Name>
+      <ElementPath>Nazev</ElementPath>
+      <Type>String</Type>
+      <Width>32</Width>
+    </PropertyDefn>
+    <!-- Identifikátor nesprávnosti na prvku -->
+    <PropertyDefn>
+      <Name>Nespravny</Name>
+      <ElementPath>Nespravny</ElementPath>
+      <Type>String</Type>
+      <Width>5</Width>
+    </PropertyDefn>
+    <!-- Nadřazená obec -->
+    <PropertyDefn>
+      <Name>ObecKod</Name>
+      <ElementPath>Obec|Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Začátek platnosti -->
+    <PropertyDefn>
+      <Name>PlatiOd</Name>
+      <ElementPath>PlatiOd</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- Konec platnosti -->
+    <PropertyDefn>
+      <Name>PlatiDo</Name>
+      <ElementPath>PlatiDo</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- ID transakce v RUIAN -->
+    <PropertyDefn>
+      <Name>IdTransakce</Name>
+      <ElementPath>IdTransakce</ElementPath>
+      <Type>Integer</Type>
+      <SubType>Integer64</SubType>
+    </PropertyDefn>
+    <!-- ID návrhu změn v ISUI -->
+    <PropertyDefn>
+      <Name>GlobalniIdNavrhuZmeny</Name>
+      <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
+      <Type>Integer</Type>
+      <SubType>Integer64</SubType>
+    </PropertyDefn>
+    <!-- Datum vzniku -->
+    <PropertyDefn>
+      <Name>DatumVzniku</Name>
+      <ElementPath>DatumVzniku</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+  </GMLFeatureClass>
+</GMLFeatureClassList>

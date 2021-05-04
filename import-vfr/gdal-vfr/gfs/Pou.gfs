@@ -1,0 +1,95 @@
+<GMLFeatureClassList>
+  <!-- POU -->
+  <GMLFeatureClass>
+    <Name>Pou</Name>
+    <ElementPath>Data|Pou|Pou</ElementPath>
+    <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
+    <!-- Geometrie definičního bodu POU -->
+    <GeomPropertyDefn>
+      <Name>DefinicniBod</Name> 
+      <ElementPath>Geometrie|DefinicniBod</ElementPath> 
+      <Type>MultiPoint</Type>
+    </GeomPropertyDefn>
+    <!-- Originální geometrie hranice POU -->
+    <GeomPropertyDefn>
+      <Name>OriginalniHranice</Name> 
+      <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
+      <Type>MultiPolygon</Type>
+    </GeomPropertyDefn>
+    <!-- Generalizovaná geometrie hranice POU (stupeň generalizace 4) -->
+    <GeomPropertyDefn>
+      <Name>GeneralizovaneHranice</Name> 
+      <ElementPath>Geometrie|GeneralizovaneHranice4</ElementPath> 
+      <Type>MultiPolygon</Type>
+    </GeomPropertyDefn>
+    <!-- Kód POU -->
+    <PropertyDefn>
+      <Name>Kod</Name>
+      <ElementPath>Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Název POU -->
+    <PropertyDefn>
+      <Name>Nazev</Name>
+      <ElementPath>Nazev</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
+    </PropertyDefn>
+    <!-- Identifikátor nesprávnosti na prvku -->
+    <PropertyDefn>
+      <Name>Nespravny</Name>
+      <ElementPath>Nespravny</ElementPath>
+      <Type>String</Type>
+      <Width>5</Width>
+    </PropertyDefn>
+    <!-- Kód správni obce -->
+    <PropertyDefn>
+      <Name>SpravniObecKod</Name>
+      <ElementPath>SpravniObecKod</ElementPath>
+      <Type>Integer</Type>
+      <Width>6</Width>
+    </PropertyDefn>
+    <!-- Nadřazený ORP -->
+    <PropertyDefn>
+      <Name>OrpKod</Name>
+      <ElementPath>Orp|Kod</ElementPath>
+      <Type>Integer</Type>
+      <Width>6</Width>
+    </PropertyDefn>
+    <!-- Začátek platnosti -->
+    <PropertyDefn>
+      <Name>PlatiOd</Name>
+      <ElementPath>PlatiOd</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- Konec platnosti -->
+    <PropertyDefn>
+      <Name>PlatiDo</Name>
+      <ElementPath>PlatiDo</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- ID transakce v RUIAN -->
+    <PropertyDefn>
+      <Name>IdTransakce</Name>
+      <ElementPath>IdTransakce</ElementPath>
+      <Type>Integer</Type>
+      <SubType>Integer64</SubType>
+    </PropertyDefn>
+    <!-- ID návrhu změn v ISUI -->
+    <PropertyDefn>
+      <Name>GlobalniIdNavrhuZmeny</Name>
+      <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
+      <Type>Integer</Type>
+      <SubType>Integer64</SubType>
+    </PropertyDefn>
+    <!-- Datum vzniku -->
+    <PropertyDefn>
+      <Name>DatumVzniku</Name>
+      <ElementPath>DatumVzniku</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+  </GMLFeatureClass>
+</GMLFeatureClassList>
