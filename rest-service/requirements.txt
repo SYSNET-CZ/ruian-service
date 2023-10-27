@@ -11,5 +11,5 @@ postgis==1.0.4
 psycopg2==2.8.6
 pytz==2020.5
 six==1.15.0
-Werkzeug==1.0.1
+Werkzeug==3.0.1
 urllib3==1.26.4
